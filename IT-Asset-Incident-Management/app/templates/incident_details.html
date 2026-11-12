@@ -1,0 +1,650 @@
+
+{% extends "base.html" %}
+
+{% block title %}Incident Details - ITAMIS{% endblock %}
+
+{% block content %}
+
+<!-- PAGE HEADER -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <div>
+        <h2 class="fw-bold mb-1">Incident Details</h2>
+        <p class="text-muted mb-0">
+            Manage and track incident {{ incident.incident_number }}.
+        </p>
+    </div>
+
+    <a href="{{ url_for('main.incidents') }}"
+       class="btn btn-outline-secondary">
+        Back to Incidents
+    </a>
+
+</div>
+
+<div class="row g-4">
+
+    <!-- LEFT COLUMN -->
+    <div class="col-lg-8">
+
+        <!-- INCIDENT INFORMATION -->
+        <div class="card shadow-sm border-0 mb-4">
+
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Incident Information</h5>
+            </div>
+
+            <div class="card-body">
+
+                <div class="row g-3">
+
+                    <!-- INCIDENT NUMBER -->
+                    <div class="col-md-6">
+                        <div class="text-muted small">
+                            Incident Number
+                        </div>
+                        <div class="fw-bold">
+                            {{ incident.incident_number }}
+                        </div>
+                    </div>
+
+                    <!-- TITLE -->
+                    <div class="col-md-6">
+                        <div class="text-muted small">
+                            Title
+                        </div>
+                        <div class="fw-bold">
+                            {{ incident.title }}
+                        </div>
+                    </div>
+
+                    <!-- REPORTER -->
+                    <div class="col-md-6">
+                        <div class="text-muted small">
+                            Reported By
+                        </div>
+                        <div>
+                            {{ incident.reporter.name }}
+                        </div>
+                    </div>
+
+                    <!-- ASSET -->
+                    <div class="col-md-6">
+                        <div class="text-muted small">
+                            Asset
+                        </div>
+                        <div>
+                            <strong>{{ incident.asset.asset_tag }}</strong>
+                            <div class="small text-muted">
+                                {{ incident.asset.name }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PRIORITY -->
+                    <div class="col-md-6">
+                        <div class="text-muted small">
+                            Priority
+                        </div>
+
+                        <div class="mt-1">
+
+                            {% if incident.priority == "CRITICAL" %}
+                                <span class="badge text-bg-danger">
+                                    CRITICAL
+                                </span>
+
+                            {% elif incident.priority == "HIGH" %}
+                                <span class="badge text-bg-danger">
+                                    HIGH
+                                </span>
+
+                            {% elif incident.priority == "MEDIUM" %}
+                                <span class="badge text-bg-warning">
+                                    MEDIUM
+                                </span>
+
+                            {% elif incident.priority == "LOW" %}
+                                <span class="badge text-bg-success">
+                                    LOW
+                                </span>
+
+                            {% else %}
+                                <span class="badge text-bg-secondary">
+                                    {{ incident.priority }}
+                                </span>
+                            {% endif %}
+
+                        </div>
+                    </div>
+
+                    <!-- STATUS -->
+                    <div class="col-md-6">
+                        <div class="text-muted small">
+                            Status
+                        </div>
+
+                        <div class="mt-1">
+
+                            {% if incident.status == "OPEN" %}
+                                <span class="badge text-bg-warning">
+                                    OPEN
+                                </span>
+
+                            {% elif incident.status == "ASSIGNED" %}
+                                <span class="badge text-bg-info">
+                                    ASSIGNED
+                                </span>
+
+                            {% elif incident.status == "IN_PROGRESS" %}
+                                <span class="badge text-bg-primary">
+                                    IN PROGRESS
+                                </span>
+
+                            {% elif incident.status == "RESOLVED" %}
+                                <span class="badge text-bg-success">
+                                    RESOLVED
+                                </span>
+
+                            {% elif incident.status == "REOPENED" %}
+                                <span class="badge text-bg-warning">
+                                    REOPENED
+                                </span>
+
+                            {% elif incident.status == "CLOSED" %}
+                                <span class="badge text-bg-dark">
+                                    CLOSED
+                                </span>
+
+                            {% else %}
+                                <span class="badge text-bg-secondary">
+                                    {{ incident.status }}
+                                </span>
+                            {% endif %}
+
+                        </div>
+                    </div>
+
+                    <!-- TECHNICIAN -->
+                    <div class="col-md-6">
+                        <div class="text-muted small">
+                            Assigned Technician
+                        </div>
+
+                        <div>
+                            {% if incident.technician %}
+                                {{ incident.technician.name }}
+                            {% else %}
+                                <span class="text-muted">
+                                    Not Assigned
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- CREATED -->
+                    <div class="col-md-6">
+                        <div class="text-muted small">
+                            Created
+                        </div>
+
+                        <div>
+                            {{ incident.created_at|ist }}
+                        </div>
+                    </div>
+
+                    <!-- DESCRIPTION -->
+                    <div class="col-12">
+                        <div class="text-muted small mb-1">
+                            Description
+                        </div>
+
+                        <div class="p-3 bg-light rounded">
+                            {{ incident.description }}
+                        </div>
+                    </div>
+
+                    <!-- RESOLUTION -->
+                    {% if incident.resolution %}
+                        <div class="col-12">
+                            <div class="text-muted small mb-1">
+                                Resolution
+                            </div>
+
+                            <div class="p-3 bg-light rounded">
+                                {{ incident.resolution }}
+                            </div>
+                        </div>
+                    {% endif %}
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ASSIGN TECHNICIAN -->
+        <div class="card shadow-sm border-0 mb-4">
+
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Assign Technician</h5>
+            </div>
+
+            <div class="card-body">
+
+                <form method="POST"
+                      action="{{ url_for(
+                          'main.assign_incident',
+                          incident_id=incident.id
+                      ) }}">
+
+                    <div class="mb-3">
+
+                        <label for="technician_id"
+                               class="form-label fw-semibold">
+                            Technician
+                        </label>
+
+                        <select
+                            class="form-select"
+                            id="technician_id"
+                            name="technician_id"
+                            required
+                        >
+
+                            <option value="">
+                                -- Select Technician --
+                            </option>
+
+                            {% for technician in technicians %}
+
+                                <option
+                                    value="{{ technician.id }}"
+                                    {% if incident.assigned_to == technician.id %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    {{ technician.name }} -
+                                    {{ technician.email }}
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        Assign Incident
+                    </button>
+
+                </form>
+
+            </div>
+        </div>
+
+        <!-- ADD COMMENT -->
+        <div class="card shadow-sm border-0 mb-4">
+
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Add Comment</h5>
+            </div>
+
+            <div class="card-body">
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'main.admin_add_incident_comment',
+                        incident_id=incident.id
+                    ) }}"
+                >
+
+                    <div class="mb-3">
+
+                        <label for="comment"
+                               class="form-label fw-semibold">
+                            Comment
+                        </label>
+
+                        <textarea
+                            class="form-control"
+                            id="comment"
+                            name="comment"
+                            rows="4"
+                            required
+                            placeholder="Enter your comment..."
+                        ></textarea>
+
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        Add Comment
+                    </button>
+
+                </form>
+
+            </div>
+        </div>
+
+        <!-- COMMENTS -->
+        <div class="card shadow-sm border-0 mb-4">
+
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Comments</h5>
+            </div>
+
+            <div class="card-body">
+
+                {% if incident.comments %}
+
+                    {% for comment in incident.comments %}
+
+                        <div class="border-bottom pb-3 mb-3">
+
+                            <div class="d-flex justify-content-between">
+
+                                <strong>
+                                    {{ comment.user.name }}
+                                </strong>
+
+                                <small class="text-muted">
+                                    {{ comment.created_at|ist }}
+                                </small>
+
+                            </div>
+
+                            <p class="mb-0 mt-2">
+                                {{ comment.comment }}
+                            </p>
+
+                        </div>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <p class="text-muted mb-0">
+                        No comments yet.
+                    </p>
+
+                {% endif %}
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="col-lg-4">
+
+        <!-- INCIDENT SUMMARY -->
+        <div class="card shadow-sm border-0 mb-4">
+
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Incident Summary</h5>
+            </div>
+
+            <div class="card-body">
+
+                <div class="mb-3">
+
+                    <div class="text-muted small">
+                        Incident
+                    </div>
+
+                    <strong>
+                        {{ incident.incident_number }}
+                    </strong>
+
+                </div>
+
+                <!-- CURRENT STATUS -->
+                <div class="mb-3">
+
+                    <div class="text-muted small">
+                        Current Status
+                    </div>
+
+                    <div class="mt-1">
+
+                        {% if incident.status == "OPEN" %}
+                            <span class="badge text-bg-warning">
+                                OPEN
+                            </span>
+
+                        {% elif incident.status == "ASSIGNED" %}
+                            <span class="badge text-bg-info">
+                                ASSIGNED
+                            </span>
+
+                        {% elif incident.status == "IN_PROGRESS" %}
+                            <span class="badge text-bg-primary">
+                                IN PROGRESS
+                            </span>
+
+                        {% elif incident.status == "RESOLVED" %}
+                            <span class="badge text-bg-success">
+                                RESOLVED
+                            </span>
+
+                        {% elif incident.status == "REOPENED" %}
+                            <span class="badge text-bg-warning">
+                                REOPENED
+                            </span>
+
+                        {% elif incident.status == "CLOSED" %}
+                            <span class="badge text-bg-dark">
+                                CLOSED
+                            </span>
+
+                        {% else %}
+                            <span class="badge text-bg-secondary">
+                                {{ incident.status }}
+                            </span>
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+                <!-- EMPLOYEE FEEDBACK PENDING -->
+                {% if incident.status == "RESOLVED" %}
+
+                    <div class="alert alert-info mb-3">
+
+                        <strong>Awaiting Employee Feedback</strong>
+
+                        <p class="mb-0 mt-2">
+                            The technician has marked this incident as
+                            resolved. The reporting employee must confirm
+                            that the issue is fixed before the incident
+                            can be closed.
+                        </p>
+
+                    </div>
+
+                {% elif incident.status == "REOPENED" %}
+
+                    <div class="alert alert-warning mb-3">
+
+                        <strong>Incident Reopened</strong>
+
+                        <p class="mb-0 mt-2">
+                            The employee reported that the issue has not
+                            been fully resolved. Please ensure the incident
+                            is assigned to a technician.
+                        </p>
+
+                    </div>
+
+                {% elif incident.status == "CLOSED" %}
+
+                    <div class="alert alert-dark mb-3">
+
+                        <strong>Incident Closed</strong>
+
+                        <p class="mb-0 mt-2">
+                            This incident has been closed following
+                            employee confirmation.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+                <!-- TECHNICIAN -->
+                <div>
+
+                    <div class="text-muted small">
+                        Technician
+                    </div>
+
+                    <div>
+                        {% if incident.technician %}
+                            {{ incident.technician.name }}
+                        {% else %}
+                            <span class="text-muted">
+                                Not Assigned
+                            </span>
+                        {% endif %}
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- EMPLOYEE FEEDBACK HISTORY -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Employee Feedback</h5>
+            </div>
+            <div class="card-body">
+                {% if incident.feedback %}
+                    {% for feedback in incident.feedback|sort(attribute="created_at", reverse=true) %}
+                        <div class="border rounded p-3 mb-3">
+                            <div class="d-flex justify-content-between flex-wrap gap-2 mb-2">
+                                <strong>{{ feedback.employee.name }}</strong>
+                                <small class="text-muted">{{ feedback.created_at|ist }}</small>
+                            </div>
+
+                            <p class="mb-1">
+                                <strong>Satisfied with technician's work:</strong>
+                                {% if feedback.is_satisfied %}
+                                    <span class="text-success">Yes</span>
+                                {% else %}
+                                    <span class="text-danger">No</span>
+                                {% endif %}
+                            </p>
+                            <p class="mb-1">
+                                <strong>Issue completely fixed:</strong>
+                                {% if feedback.is_resolved %}
+                                    <span class="text-success">Yes</span>
+                                {% else %}
+                                    <span class="text-danger">No</span>
+                                {% endif %}
+                            </p>
+                            <p class="mb-1">
+                                <strong>Asset working properly:</strong>
+                                {% if feedback.is_working %}
+                                    <span class="text-success">Yes</span>
+                                {% else %}
+                                    <span class="text-danger">No</span>
+                                {% endif %}
+                            </p>
+                            {% if feedback.comments %}
+                                <div class="mt-2 p-2 bg-light rounded">
+                                    <strong>Employee comments:</strong><br>
+                                    {{ feedback.comments }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted mb-0">No employee feedback has been submitted yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- INCIDENT HISTORY -->
+        <div class="card shadow-sm border-0">
+
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Incident History</h5>
+            </div>
+
+            <div class="card-body">
+
+                {% if incident.history %}
+
+                    {% for history in incident.history %}
+
+                        <div class="border-start border-primary border-3 ps-3 mb-4">
+
+                            <div class="small text-muted">
+                                {{ history.created_at|ist }}
+                            </div>
+
+                            <div class="mt-1">
+
+                                {% if history.old_status %}
+
+                                    <span class="badge text-bg-secondary">
+                                        {{ history.old_status }}
+                                    </span>
+
+                                    <span class="mx-1">
+                                        →
+                                    </span>
+
+                                {% endif %}
+
+                                {% if history.new_status %}
+
+                                    <span class="badge text-bg-primary">
+                                        {{ history.new_status }}
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+
+                            {% if history.comment %}
+
+                                <div class="small mt-2">
+                                    {{ history.comment }}
+                                </div>
+
+                            {% endif %}
+
+                            <div class="small text-muted mt-1">
+                                Changed by user ID:
+                                {{ history.changed_by }}
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <p class="text-muted mb-0">
+                        No history available.
+                    </p>
+
+                {% endif %}
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

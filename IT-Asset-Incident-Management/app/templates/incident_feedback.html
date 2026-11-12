@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Incident Feedback - ITAMIS{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 850px;">
+
+    <div class="mb-4">
+        <h2 class="fw-bold mb-1">Incident Feedback</h2>
+        <p class="text-muted mb-0">
+            Please confirm whether the technician's work has resolved your issue.
+        </p>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Incident Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="text-muted small">Incident Number</div>
+                    <strong>{{ incident.incident_number }}</strong>
+                </div>
+                <div class="col-md-6">
+                    <div class="text-muted small">Title</div>
+                    <strong>{{ incident.title }}</strong>
+                </div>
+                <div class="col-12">
+                    <div class="text-muted small mb-1">Technician's Resolution</div>
+                    <div class="p-3 bg-light rounded">
+                        {{ incident.resolution or "No resolution details were provided." }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Your Feedback</h5>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info">
+                If you are not satisfied or the issue is still present, your incident
+                will be reopened so the technician can continue working on it.
+            </div>
+
+            <form method="POST">
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">
+                        1. Are you satisfied with the technician's work?
+                    </label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio"
+                               name="is_satisfied" id="satisfied_yes"
+                               value="yes" required>
+                        <label class="form-check-label" for="satisfied_yes">Yes</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio"
+                               name="is_satisfied" id="satisfied_no"
+                               value="no" required>
+                        <label class="form-check-label" for="satisfied_no">No</label>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">
+                        2. Is the issue completely fixed?
+                    </label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio"
+                               name="is_resolved" id="resolved_yes"
+                               value="yes" required>
+                        <label class="form-check-label" for="resolved_yes">Yes</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio"
+                               name="is_resolved" id="resolved_no"
+                               value="no" required>
+                        <label class="form-check-label" for="resolved_no">No</label>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">
+                        3. Is the asset working properly now?
+                    </label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio"
+                               name="is_working" id="working_yes"
+                               value="yes" required>
+                        <label class="form-check-label" for="working_yes">Yes</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio"
+                               name="is_working" id="working_no"
+                               value="no" required>
+                        <label class="form-check-label" for="working_no">No</label>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="comments" class="form-label fw-semibold">
+                        Comments / Explain what is still wrong
+                    </label>
+                    <textarea class="form-control" id="comments" name="comments"
+                              rows="4" maxlength="3000"
+                              placeholder="Share your feedback. If you answered No to any question, explain what still needs attention."></textarea>
+                    <div class="form-text">
+                        Comments are required if you are dissatisfied or the issue is not fully fixed.
+                    </div>
+                </div>
+
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        Submit Feedback
+                    </button>
+                    <a href="{{ url_for('main.my_incidents') }}"
+                       class="btn btn-outline-secondary">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

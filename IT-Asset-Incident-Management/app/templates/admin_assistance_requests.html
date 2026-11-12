@@ -1,0 +1,239 @@
+
+{% extends "base.html" %}
+
+{% block title %}Assistance Requests - ITAMIS{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="mb-4">
+        <h2 class="fw-bold mb-1">Technician Assistance Requests</h2>
+
+        <p class="text-muted mb-0">
+            Review requests and assign additional technicians to incidents.
+        </p>
+    </div>
+
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header bg-white">
+            <h5 class="mb-0">All Assistance Requests</h5>
+        </div>
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover table-bordered align-middle">
+
+                    <thead class="table-light">
+                        <tr>
+                            <th>Request ID</th>
+                            <th>Incident</th>
+                            <th>Primary Technician</th>
+                            <th>Reason</th>
+                            <th>Requested At</th>
+                            <th>Status</th>
+                            <th>Supporting Technician</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for assistance in assistance_requests %}
+
+                            <tr>
+
+                                <td>{{ assistance.id }}</td>
+
+                                <td>
+                                    <strong>
+                                        {{ assistance.incident.incident_number }}
+                                    </strong>
+
+                                    <div class="small text-muted">
+                                        {{ assistance.incident.title }}
+                                    </div>
+                                </td>
+
+                                <td>
+                                    {{ assistance.requested_by.name }}
+                                </td>
+
+                                <td style="min-width: 180px;">
+                                    {{ assistance.reason }}
+                                </td>
+
+                                <td>
+                                    {{ assistance.created_at|ist }}
+                                </td>
+
+                                <td>
+
+                                    {% if assistance.status == "PENDING" %}
+
+                                        <span class="badge bg-warning text-dark">
+                                            PENDING
+                                        </span>
+
+                                    {% elif assistance.status == "ASSIGNED" %}
+
+                                        <span class="badge bg-primary">
+                                            ASSIGNED
+                                        </span>
+
+                                    {% elif assistance.status == "COMPLETED" %}
+
+                                        <span class="badge bg-success">
+                                            COMPLETED
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge bg-secondary">
+                                            {{ assistance.status }}
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                                <td>
+
+                                    {% if assistance.supporting_technician %}
+
+                                        {{ assistance.supporting_technician.name }}
+
+                                    {% else %}
+
+                                        <span class="text-muted">
+                                            Not assigned
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                                <td style="min-width: 230px;">
+
+                                    {% if assistance.status == "PENDING" %}
+
+                                        <form
+                                            method="POST"
+                                            action="{{ url_for(
+                                                'main.assign_supporting_technician',
+                                                assistance_id=assistance.id
+                                            ) }}"
+                                        >
+
+                                            <div class="mb-2">
+
+                                                <select
+                                                    name="technician_id"
+                                                    class="form-select form-select-sm"
+                                                    required
+                                                >
+
+                                                    <option value="">
+                                                        Select Technician
+                                                    </option>
+
+                                                    {% for technician in technicians %}
+
+                                                        {% if technician.id != assistance.requested_by_id
+                                                              and technician.id != assistance.incident.assigned_to %}
+
+                                                            <option value="{{ technician.id }}">
+                                                                {{ technician.name }}
+                                                            </option>
+
+                                                        {% endif %}
+
+                                                    {% endfor %}
+
+                                                </select>
+
+                                            </div>
+
+                                            <div class="mb-2">
+
+                                                <textarea
+                                                    name="admin_note"
+                                                    class="form-control form-control-sm"
+                                                    rows="2"
+                                                    placeholder="Admin note (optional)"
+                                                ></textarea>
+
+                                            </div>
+
+                                            <button
+                                                type="submit"
+                                                class="btn btn-primary btn-sm w-100"
+                                            >
+                                                Assign Technician
+                                            </button>
+
+                                        </form>
+
+                                    {% elif assistance.status == "ASSIGNED" %}
+
+                                        <span class="text-primary fw-semibold">
+                                            Technician assigned
+                                        </span>
+
+                                        {% if assistance.admin_note %}
+                                            <div class="small text-muted mt-1">
+                                                {{ assistance.admin_note }}
+                                            </div>
+                                        {% endif %}
+
+                                    {% elif assistance.status == "COMPLETED" %}
+
+                                        <span class="text-success fw-semibold">
+                                            Assistance completed
+                                        </span>
+
+                                        {% if assistance.completed_at %}
+                                            <div class="small text-muted mt-1">
+                                                Completed:
+                                                {{ assistance.completed_at|ist }}
+                                            </div>
+                                        {% endif %}
+
+                                        {% if assistance.admin_note %}
+                                            <div class="small text-muted mt-1">
+                                                Admin note: {{ assistance.admin_note }}
+                                            </div>
+                                        {% endif %}
+
+                                    {% endif %}
+
+                                </td>
+
+                            </tr>
+
+                        {% else %}
+
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-4">
+                                    No technician assistance requests found.
+                                </td>
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

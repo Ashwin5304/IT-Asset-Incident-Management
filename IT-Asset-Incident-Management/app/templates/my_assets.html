@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}My Assets - ITAMIS{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1">My Assets</h2>
+        <p class="text-muted mb-0">
+            IT assets currently assigned to you.
+        </p>
+    </div>
+
+    <span class="badge text-bg-primary fs-6">
+        {{ assets|length }} Asset{% if assets|length != 1 %}s{% endif %}
+    </span>
+</div>
+
+
+<div class="card shadow-sm border-0">
+
+    <div class="card-header bg-white">
+        <h5 class="mb-0">Assigned Assets</h5>
+    </div>
+
+    <div class="card-body p-0">
+
+        {% if assets %}
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle mb-0">
+
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Asset Tag</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Serial Number</th>
+                        <th>Department</th>
+                        <th>Location</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for asset in assets %}
+
+                    <tr>
+
+                        <td class="ps-4">
+                            <strong>{{ asset.asset_tag }}</strong>
+                        </td>
+
+                        <td>
+                            {{ asset.name }}
+                        </td>
+
+                        <td>
+                            <span class="badge text-bg-light border">
+                                {{ asset.asset_type }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {{ asset.serial_number or "-" }}
+                        </td>
+
+                        <td>
+                            {{ asset.department or "-" }}
+                        </td>
+
+                        <td>
+                            {{ asset.location or "-" }}
+                        </td>
+
+                        <td>
+
+                            {% if asset.status == "ACTIVE" %}
+
+                                <span class="badge text-bg-success">
+                                    ACTIVE
+                                </span>
+
+                            {% elif asset.status == "INACTIVE" %}
+
+                                <span class="badge text-bg-secondary">
+                                    INACTIVE
+                                </span>
+
+                            {% elif asset.status == "UNDER_REPAIR" %}
+
+                                <span class="badge text-bg-warning">
+                                    UNDER REPAIR
+                                </span>
+
+                            {% elif asset.status == "RETIRED" %}
+
+                                <span class="badge text-bg-dark">
+                                    RETIRED
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge text-bg-secondary">
+                                    {{ asset.status }}
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <div class="text-center py-5">
+
+            <h5>No Assets Assigned</h5>
+
+            <p class="text-muted mb-0">
+                You currently have no IT assets assigned to you.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

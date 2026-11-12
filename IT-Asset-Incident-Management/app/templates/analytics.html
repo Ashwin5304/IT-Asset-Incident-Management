@@ -1,0 +1,438 @@
+{% extends "base.html" %}
+
+{% block title %}Incident Analytics - ITAMIS{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- PAGE HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2 class="fw-bold mb-1">Incident Analytics</h2>
+
+            <p class="text-muted mb-0">
+                Analyze incident status, priority and technician workload.
+            </p>
+        </div>
+
+        <a href="{{ url_for('main.dashboard') }}"
+           class="btn btn-outline-secondary">
+            Back to Dashboard
+        </a>
+
+    </div>
+
+
+    <!-- STATUS SUMMARY -->
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header bg-white">
+            <h5 class="mb-0">
+                Incidents by Status
+            </h5>
+        </div>
+
+        <div class="card-body">
+
+            <div class="row g-3">
+
+                <div class="col-md-6 col-xl-2">
+                    <div class="p-3 bg-light rounded text-center">
+                        <div class="text-muted small">
+                            Open
+                        </div>
+
+                        <div class="fs-3 fw-bold">
+                            {{ open_count }}
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-md-6 col-xl-2">
+                    <div class="p-3 bg-light rounded text-center">
+                        <div class="text-muted small">
+                            Assigned
+                        </div>
+
+                        <div class="fs-3 fw-bold">
+                            {{ assigned_count }}
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-md-6 col-xl-3">
+                    <div class="p-3 bg-light rounded text-center">
+                        <div class="text-muted small">
+                            In Progress
+                        </div>
+
+                        <div class="fs-3 fw-bold">
+                            {{ in_progress_count }}
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-md-6 col-xl-2">
+                    <div class="p-3 bg-light rounded text-center">
+                        <div class="text-muted small">
+                            Resolved
+                        </div>
+
+                        <div class="fs-3 fw-bold">
+                            {{ resolved_count }}
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-md-6 col-xl-2">
+                    <div class="p-3 bg-light rounded text-center">
+                        <div class="text-muted small">
+                            Closed
+                        </div>
+
+                        <div class="fs-3 fw-bold">
+                            {{ closed_count }}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- PRIORITY SUMMARY -->
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header bg-white">
+            <h5 class="mb-0">
+                Incidents by Priority
+            </h5>
+        </div>
+
+        <div class="card-body">
+
+            <div class="row g-3">
+
+                <div class="col-md-6 col-xl-3">
+
+                    <div class="p-3 border rounded">
+
+                        <div class="text-muted small">
+                            Critical
+                        </div>
+
+                        <div class="fs-3 fw-bold">
+                            {{ critical_count }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-6 col-xl-3">
+
+                    <div class="p-3 border rounded">
+
+                        <div class="text-muted small">
+                            High
+                        </div>
+
+                        <div class="fs-3 fw-bold">
+                            {{ high_count }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-6 col-xl-3">
+
+                    <div class="p-3 border rounded">
+
+                        <div class="text-muted small">
+                            Medium
+                        </div>
+
+                        <div class="fs-3 fw-bold">
+                            {{ medium_count }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-6 col-xl-3">
+
+                    <div class="p-3 border rounded">
+
+                        <div class="text-muted small">
+                            Low
+                        </div>
+
+                        <div class="fs-3 fw-bold">
+                            {{ low_count }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- TECHNICIAN WORKLOAD -->
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header bg-white">
+
+            <h5 class="mb-0">
+                Technician Workload
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            {% if technician_stats %}
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th>Technician</th>
+                            <th>Total Assigned</th>
+                            <th>Active</th>
+                            <th>Resolved</th>
+                            <th>Closed</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for technician in technician_stats %}
+
+                        <tr>
+
+                            <td>
+                                <strong>
+                                    {{ technician.name }}
+                                </strong>
+                            </td>
+
+                            <td>
+                                {{ technician.assigned }}
+                            </td>
+
+                            <td>
+                                {{ technician.active }}
+                            </td>
+
+                            <td>
+                                {{ technician.resolved }}
+                            </td>
+
+                            <td>
+                                {{ technician.closed }}
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            {% else %}
+
+            <p class="text-muted mb-0">
+                No technicians are currently registered.
+            </p>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- RECENT INCIDENTS -->
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header bg-white">
+
+            <h5 class="mb-0">
+                Recent Incidents
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            {% if recent_incidents %}
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th>Incident</th>
+                            <th>Title</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Created</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for incident in recent_incidents %}
+
+                        <tr>
+
+                            <td>
+                                <strong>
+                                    {{ incident.incident_number }}
+                                </strong>
+                            </td>
+
+                            <td>
+                                {{ incident.title }}
+                            </td>
+
+                            <td>
+
+                                {% if incident.priority == "CRITICAL" %}
+
+                                    <span class="badge text-bg-danger">
+                                        CRITICAL
+                                    </span>
+
+                                {% elif incident.priority == "HIGH" %}
+
+                                    <span class="badge text-bg-danger">
+                                        HIGH
+                                    </span>
+
+                                {% elif incident.priority == "MEDIUM" %}
+
+                                    <span class="badge text-bg-warning">
+                                        MEDIUM
+                                    </span>
+
+                                {% elif incident.priority == "LOW" %}
+
+                                    <span class="badge text-bg-success">
+                                        LOW
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="badge text-bg-secondary">
+                                        {{ incident.priority }}
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <td>
+
+                                {% if incident.status == "OPEN" %}
+
+                                    <span class="badge text-bg-warning">
+                                        OPEN
+                                    </span>
+
+                                {% elif incident.status == "ASSIGNED" %}
+
+                                    <span class="badge text-bg-info">
+                                        ASSIGNED
+                                    </span>
+
+                                {% elif incident.status == "IN_PROGRESS" %}
+
+                                    <span class="badge text-bg-primary">
+                                        IN PROGRESS
+                                    </span>
+
+                                {% elif incident.status == "RESOLVED" %}
+
+                                    <span class="badge text-bg-success">
+                                        RESOLVED
+                                    </span>
+
+                                {% elif incident.status == "CLOSED" %}
+
+                                    <span class="badge text-bg-dark">
+                                        CLOSED
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="badge text-bg-secondary">
+                                        {{ incident.status }}
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <td>
+                                {{ incident.created_at|ist }}
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            {% else %}
+
+            <p class="text-muted mb-0">
+                No incidents have been reported yet.
+            </p>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

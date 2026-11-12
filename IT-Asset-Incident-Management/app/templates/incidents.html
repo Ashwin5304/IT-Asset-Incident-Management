@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block title %}Incidents - ITAMIS{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1">Incident Management</h2>
+        <p class="text-muted mb-0">
+            Monitor, assign and manage IT incidents.
+        </p>
+    </div>
+
+    <span class="badge text-bg-primary fs-6">
+        {{ incidents|length }} Incident{% if incidents|length != 1 %}s{% endif %}
+    </span>
+</div>
+
+
+<div class="card shadow-sm border-0">
+
+    <div class="card-header bg-white">
+        <h5 class="mb-0">Incident Registry</h5>
+    </div>
+
+    <div class="card-body p-0">
+
+        {% if incidents %}
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle mb-0">
+
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Incident</th>
+                        <th>Title</th>
+                        <th>Reported By</th>
+                        <th>Asset</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Technician</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for incident in incidents %}
+
+                    <tr>
+
+                        <!-- INCIDENT NUMBER -->
+                        <td class="ps-4">
+                            <strong>{{ incident.incident_number }}</strong>
+                        </td>
+
+
+                        <!-- TITLE -->
+                        <td>
+                            {{ incident.title }}
+                        </td>
+
+
+                        <!-- REPORTER -->
+                        <td>
+                            {{ incident.reporter.name }}
+                        </td>
+
+
+                        <!-- ASSET -->
+                        <td>
+                            <span class="badge text-bg-light border">
+                                {{ incident.asset.asset_tag }}
+                            </span>
+                        </td>
+
+
+                        <!-- PRIORITY -->
+                        <td>
+
+                            {% if incident.priority == "CRITICAL" %}
+
+                                <span class="badge text-bg-danger">
+                                    CRITICAL
+                                </span>
+
+                            {% elif incident.priority == "HIGH" %}
+
+                                <span class="badge text-bg-danger">
+                                    HIGH
+                                </span>
+
+                            {% elif incident.priority == "MEDIUM" %}
+
+                                <span class="badge text-bg-warning">
+                                    MEDIUM
+                                </span>
+
+                            {% elif incident.priority == "LOW" %}
+
+                                <span class="badge text-bg-success">
+                                    LOW
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge text-bg-secondary">
+                                    {{ incident.priority }}
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- STATUS -->
+                        <td>
+
+                            {% if incident.status == "OPEN" %}
+
+                                <span class="badge text-bg-warning">
+                                    OPEN
+                                </span>
+
+                            {% elif incident.status == "ASSIGNED" %}
+
+                                <span class="badge text-bg-info">
+                                    ASSIGNED
+                                </span>
+
+                            {% elif incident.status == "IN_PROGRESS" %}
+
+                                <span class="badge text-bg-primary">
+                                    IN PROGRESS
+                                </span>
+
+                            {% elif incident.status == "RESOLVED" %}
+
+                                <span class="badge text-bg-success">
+                                    RESOLVED
+                                </span>
+
+                            {% elif incident.status == "CLOSED" %}
+
+                                <span class="badge text-bg-dark">
+                                    CLOSED
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge text-bg-secondary">
+                                    {{ incident.status }}
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- TECHNICIAN -->
+                        <td>
+
+                            {% if incident.technician %}
+
+                                {{ incident.technician.name }}
+
+                            {% else %}
+
+                                <span class="text-muted">
+                                    Not Assigned
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- ACTION -->
+                        <td>
+
+                            <a
+                                href="{{ url_for(
+                                    'main.incident_details',
+                                    incident_id=incident.id
+                                ) }}"
+                                class="btn btn-sm btn-outline-primary"
+                            >
+                                View
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <div class="text-center py-5">
+
+            <h5>No Incidents Found</h5>
+
+            <p class="text-muted mb-0">
+                There are currently no incidents registered in the system.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

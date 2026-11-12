@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block title %}Report Incident - ITAMIS{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+    <div class="col-lg-8 col-xl-7">
+
+        <div class="mb-4">
+            <h2 class="fw-bold mb-1">Report IT Incident</h2>
+            <p class="text-muted mb-0">
+                Report a problem with one of your assigned IT assets.
+            </p>
+        </div>
+
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Incident Information</h5>
+            </div>
+
+            <div class="card-body p-4">
+
+                {% if error %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+                {% endif %}
+
+
+                {% if assets %}
+
+                <form method="POST">
+
+                    <!-- ASSET -->
+                    <div class="mb-3">
+
+                        <label for="asset_id"
+                               class="form-label fw-semibold">
+                            Asset
+                        </label>
+
+                        <select
+                            class="form-select"
+                            id="asset_id"
+                            name="asset_id"
+                            required
+                        >
+
+                            <option value="">
+                                -- Select Your Asset --
+                            </option>
+
+                            {% for asset in assets %}
+
+                            <option value="{{ asset.id }}">
+                                {{ asset.asset_tag }} - {{ asset.name }}
+                            </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                        <div class="form-text">
+                            Select the asset that is experiencing the problem.
+                        </div>
+
+                    </div>
+
+
+                    <!-- TITLE -->
+                    <div class="mb-3">
+
+                        <label for="title"
+                               class="form-label fw-semibold">
+                            Incident Title
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="title"
+                            name="title"
+                            maxlength="200"
+                            placeholder="Example: Laptop is not turning on"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- DESCRIPTION -->
+                    <div class="mb-3">
+
+                        <label for="description"
+                               class="form-label fw-semibold">
+                            Description
+                        </label>
+
+                        <textarea
+                            class="form-control"
+                            id="description"
+                            name="description"
+                            rows="6"
+                            placeholder="Describe the problem in detail..."
+                            required
+                        ></textarea>
+
+                        <div class="form-text">
+                            Include useful details such as error messages,
+                            symptoms, or what happened before the problem.
+                        </div>
+
+                    </div>
+
+
+                    <!-- PRIORITY -->
+                    <div class="mb-4">
+
+                        <label for="priority"
+                               class="form-label fw-semibold">
+                            Priority
+                        </label>
+
+                        <select
+                            class="form-select"
+                            id="priority"
+                            name="priority"
+                            required
+                        >
+
+                            <option value="LOW">
+                                Low
+                            </option>
+
+                            <option value="MEDIUM" selected>
+                                Medium
+                            </option>
+
+                            <option value="HIGH">
+                                High
+                            </option>
+
+                            <option value="CRITICAL">
+                                Critical
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- ACTIONS -->
+                    <div class="d-flex gap-2 pt-3 border-top">
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary"
+                        >
+                            Report Incident
+                        </button>
+
+                        <a
+                            href="{{ url_for('main.my_incidents') }}"
+                            class="btn btn-outline-secondary"
+                        >
+                            Cancel
+                        </a>
+
+                    </div>
+
+                </form>
+
+
+                {% else %}
+
+                <div class="text-center py-4">
+
+                    <div class="mb-3">
+                        <span class="fs-1">!</span>
+                    </div>
+
+                    <h5>No Assets Assigned</h5>
+
+                    <p class="text-muted">
+                        You currently have no assets assigned to you.
+                        You cannot report an incident until an asset is
+                        assigned to your account.
+                    </p>
+
+                    <a
+                        href="{{ url_for('main.dashboard') }}"
+                        class="btn btn-outline-primary"
+                    >
+                        Back to Dashboard
+                    </a>
+
+                </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

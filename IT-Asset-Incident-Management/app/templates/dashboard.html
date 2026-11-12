@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - ITAMIS{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1">Dashboard</h2>
+        <p class="text-muted mb-0">
+            Welcome, {{ current_user.name }}
+        </p>
+    </div>
+</div>
+
+
+{% if current_user.role == "ADMIN" %}
+
+<!-- ADMIN DASHBOARD -->
+
+<div class="row g-4 mb-4">
+
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <div class="text-muted small">Total Users</div>
+                <div class="fs-2 fw-bold">{{ total_users }}</div>
+                <a href="{{ url_for('main.users') }}"
+                   class="btn btn-sm btn-outline-primary mt-2">
+                    Manage Users
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <div class="text-muted small">Total Assets</div>
+                <div class="fs-2 fw-bold">{{ total_assets }}</div>
+                <a href="{{ url_for('main.assets') }}"
+                   class="btn btn-sm btn-outline-primary mt-2">
+                    Manage Assets
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <div class="text-muted small">Total Incidents</div>
+                <div class="fs-2 fw-bold">{{ total_incidents }}</div>
+                <a href="{{ url_for('main.incidents') }}"
+                   class="btn btn-sm btn-outline-primary mt-2">
+                    View Incidents
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <div class="text-muted small">Open Incidents</div>
+                <div class="fs-2 fw-bold">{{ open_incidents }}</div>
+                <span class="badge text-bg-warning mt-2">
+                    Needs Attention
+                </span>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white">
+        <h5 class="mb-0">Incident Overview</h5>
+    </div>
+
+    <div class="card-body">
+
+        <div class="row text-center g-3">
+
+            <div class="col-md-3">
+                <div class="p-3 bg-light rounded">
+                    <div class="text-muted small">Open</div>
+                    <div class="fs-3 fw-bold">{{ open_incidents }}</div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="p-3 bg-light rounded">
+                    <div class="text-muted small">Assigned</div>
+                    <div class="fs-3 fw-bold">{{ assigned_incidents }}</div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="p-3 bg-light rounded">
+                    <div class="text-muted small">In Progress</div>
+                    <div class="fs-3 fw-bold">{{ in_progress_incidents }}</div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="p-3 bg-light rounded">
+                    <div class="text-muted small">Resolved</div>
+                    <div class="fs-3 fw-bold">{{ resolved_incidents }}</div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="p-3 bg-light rounded">
+                    <div class="text-muted small">Closed</div>
+                    <div class="fs-3 fw-bold">{{ closed_incidents }}</div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+{% elif current_user.role == "TECHNICIAN" %}
+
+<!-- TECHNICIAN DASHBOARD -->
+
+<div class="row g-4 mb-4">
+
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <div class="text-muted small">Assigned Incidents</div>
+                <div class="fs-2 fw-bold">{{ assigned_incidents }}</div>
+                <a href="{{ url_for('main.technician_incidents') }}"
+                   class="btn btn-sm btn-outline-primary mt-2">
+                    View Incidents
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <div class="text-muted small">Pending</div>
+                <div class="fs-2 fw-bold">{{ open_incidents }}</div>
+                <span class="badge text-bg-warning mt-2">
+                    Assigned
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <div class="text-muted small">In Progress</div>
+                <div class="fs-2 fw-bold">{{ in_progress_incidents }}</div>
+                <span class="badge text-bg-primary mt-2">
+                    Working
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <div class="text-muted small">Resolved</div>
+                <div class="fs-2 fw-bold">{{ resolved_incidents }}</div>
+                <span class="badge text-bg-success mt-2">
+                    Completed
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+    <div class="card shadow-sm border-0 h-100">
+        <div class="card-body">
+            <div class="text-muted small">Closed</div>
+
+            <div class="fs-2 fw-bold">
+                {{ closed_incidents }}
+            </div>
+
+            <span class="badge text-bg-dark mt-2">
+                Closed by Admin
+            </span>
+        </div>
+    </div>
+</div>
+
+</div>
+
+
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white">
+        <h5 class="mb-0">Technician Actions</h5>
+    </div>
+
+    <div class="card-body">
+
+        <a href="{{ url_for('main.technician_incidents') }}"
+           class="btn btn-primary">
+            View My Assigned Incidents
+        </a>
+
+    </div>
+</div>
+
+
+{% else %}
+
+<!-- EMPLOYEE DASHBOARD -->
+
+<div class="row g-4 mb-4">
+
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <div class="text-muted small">My Assets</div>
+                <div class="fs-2 fw-bold">{{ my_assets }}</div>
+                <span class="badge text-bg-primary mt-2">
+                    Assigned to Me
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <div class="text-muted small">My Incidents</div>
+                <div class="fs-2 fw-bold">{{ my_incidents }}</div>
+                <a href="{{ url_for('main.my_incidents') }}"
+                   class="btn btn-sm btn-outline-primary mt-2">
+                    View Incidents
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <div class="text-muted small">Open Incidents</div>
+                <div class="fs-2 fw-bold">{{ open_incidents }}</div>
+                <span class="badge text-bg-warning mt-2">
+                    Open
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <div class="text-muted small">Resolved</div>
+                <div class="fs-2 fw-bold">{{ resolved_incidents }}</div>
+                <span class="badge text-bg-success mt-2">
+                    Completed
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+    <div class="card shadow-sm border-0 h-100">
+        <div class="card-body">
+            <div class="text-muted small">Closed</div>
+
+            <div class="fs-2 fw-bold">
+                {{ closed_incidents }}
+            </div>
+
+            <span class="badge text-bg-dark mt-2">
+                Closed
+            </span>
+        </div>
+    </div>
+</div>
+
+
+</div>
+
+
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white">
+        <h5 class="mb-0">Quick Actions</h5>
+    </div>
+
+    <div class="card-body">
+
+        <a href="{{ url_for('main.report_incident') }}"
+           class="btn btn-primary me-2">
+            Report New Incident
+        </a>
+
+        <a href="{{ url_for('main.my_incidents') }}"
+           class="btn btn-outline-primary">
+            View My Incidents
+        </a>
+
+    </div>
+</div>
+
+{% endif %}
+
+{% endblock %}

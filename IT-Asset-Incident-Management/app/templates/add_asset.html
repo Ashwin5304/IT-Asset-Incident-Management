@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+
+{% block title %}Add Asset - ITAMIS{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+    <div class="col-lg-9 col-xl-8">
+
+        <div class="mb-4">
+            <h2 class="fw-bold mb-1">Add New Asset</h2>
+            <p class="text-muted mb-0">
+                Register an IT asset in the ITAMIS platform.
+            </p>
+        </div>
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Asset Information</h5>
+            </div>
+
+            <div class="card-body p-4">
+
+                {% if error %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+                {% endif %}
+
+                <form method="POST">
+
+                    <div class="row g-3">
+
+                        <!-- Asset Tag -->
+                        <div class="col-md-6">
+                            <label for="asset_tag"
+                                   class="form-label fw-semibold">
+                                Asset Tag
+                            </label>
+
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="asset_tag"
+                                name="asset_tag"
+                                placeholder="e.g. IT-LAP-003"
+                                required
+                            >
+                        </div>
+
+                        <!-- Asset Name -->
+                        <div class="col-md-6">
+                            <label for="name"
+                                   class="form-label fw-semibold">
+                                Asset Name
+                            </label>
+
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="name"
+                                name="name"
+                                placeholder="e.g. Dell Latitude Laptop"
+                                required
+                            >
+                        </div>
+
+                        <!-- Asset Type -->
+                        <div class="col-md-6">
+                            <label for="asset_type"
+                                   class="form-label fw-semibold">
+                                Asset Type
+                            </label>
+
+                            <select
+                                class="form-select"
+                                id="asset_type"
+                                name="asset_type"
+                                required
+                            >
+                                <option value="Desktop">Desktop</option>
+                                <option value="Laptop">Laptop</option>
+                                <option value="Printer">Printer</option>
+                                <option value="Projector">Projector</option>
+                                <option value="Router">Router</option>
+                                <option value="Switch">Switch</option>
+                                <option value="Server">Server</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <!-- Serial Number -->
+                        <div class="col-md-6">
+                            <label for="serial_number"
+                                   class="form-label fw-semibold">
+                                Serial Number
+                            </label>
+
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="serial_number"
+                                name="serial_number"
+                                placeholder="Enter serial number"
+                            >
+                        </div>
+
+                        <!-- Department -->
+                        <div class="col-md-6">
+                            <label for="department"
+                                   class="form-label fw-semibold">
+                                Department
+                            </label>
+
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="department"
+                                name="department"
+                                placeholder="e.g. Computer Science"
+                            >
+                        </div>
+
+                        <!-- Location -->
+                        <div class="col-md-6">
+                            <label for="location"
+                                   class="form-label fw-semibold">
+                                Location
+                            </label>
+
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="location"
+                                name="location"
+                                placeholder="e.g. Lab 1"
+                            >
+                        </div>
+
+                        <!-- Assigned To -->
+                        <div class="col-md-6">
+                            <label for="assigned_to"
+                                   class="form-label fw-semibold">
+                                Assigned To
+                            </label>
+
+                            <select
+                                class="form-select"
+                                id="assigned_to"
+                                name="assigned_to"
+                            >
+
+                                <option value="">
+                                    -- Not Assigned --
+                                </option>
+
+                                {% for employee in employees %}
+
+                                <option value="{{ employee.id }}">
+                                    {{ employee.name }} - {{ employee.email }}
+                                </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                            <div class="form-text">
+                                Leave unassigned if the asset has not yet
+                                been allocated.
+                            </div>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="col-md-6">
+                            <label for="status"
+                                   class="form-label fw-semibold">
+                                Status
+                            </label>
+
+                            <select
+                                class="form-select"
+                                id="status"
+                                name="status"
+                                required
+                            >
+                                <option value="ACTIVE">Active</option>
+                                <option value="INACTIVE">Inactive</option>
+                                <option value="UNDER_REPAIR">
+                                    Under Repair
+                                </option>
+                                <option value="RETIRED">
+                                    Retired
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Purchase Date -->
+                        <div class="col-md-6">
+                            <label for="purchase_date"
+                                   class="form-label fw-semibold">
+                                Purchase Date
+                            </label>
+
+                            <input
+                                type="date"
+                                class="form-control"
+                                id="purchase_date"
+                                name="purchase_date"
+                            >
+                        </div>
+
+                        <!-- Warranty Expiry -->
+                        <div class="col-md-6">
+                            <label for="warranty_expiry"
+                                   class="form-label fw-semibold">
+                                Warranty Expiry
+                            </label>
+
+                            <input
+                                type="date"
+                                class="form-control"
+                                id="warranty_expiry"
+                                name="warranty_expiry"
+                            >
+                        </div>
+
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="d-flex gap-2 mt-4 pt-3 border-top">
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary"
+                        >
+                            Add Asset
+                        </button>
+
+                        <a
+                            href="{{ url_for('main.assets') }}"
+                            class="btn btn-outline-secondary"
+                        >
+                            Cancel
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

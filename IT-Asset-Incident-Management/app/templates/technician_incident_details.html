@@ -1,0 +1,548 @@
+
+{% extends "base.html" %}
+
+{% block title %}Incident Details - ITAMIS{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- PAGE HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Incident Details</h2>
+            <p class="text-muted mb-0">{{ incident.incident_number }}</p>
+
+            {% if is_supporting_technician %}
+                <span class="badge bg-info text-dark mt-2">Supporting Technician</span>
+            {% elif is_primary_technician %}
+                <span class="badge bg-primary mt-2">Primary Technician</span>
+            {% endif %}
+        </div>
+
+        <a href="{{ url_for('main.technician_incidents') }}"
+           class="btn btn-outline-secondary">
+            Back to My Incidents
+        </a>
+    </div>
+
+
+    <!-- INCIDENT INFORMATION -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Incident Information</h5>
+        </div>
+
+        <div class="card-body">
+            <div class="row g-3">
+
+                <div class="col-md-6">
+                    <strong>Incident Number</strong>
+                    <div class="mt-1">{{ incident.incident_number }}</div>
+                </div>
+
+                <div class="col-md-6">
+                    <strong>Title</strong>
+                    <div class="mt-1">{{ incident.title }}</div>
+                </div>
+
+                <div class="col-md-6">
+                    <strong>Asset</strong>
+                    <div class="mt-1">
+                        {{ incident.asset.asset_tag }} - {{ incident.asset.name }}
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <strong>Priority</strong>
+                    <div class="mt-1">
+                        {% if incident.priority in ["HIGH", "CRITICAL"] %}
+                            <span class="badge bg-danger">{{ incident.priority }}</span>
+                        {% elif incident.priority == "MEDIUM" %}
+                            <span class="badge bg-warning text-dark">MEDIUM</span>
+                        {% else %}
+                            <span class="badge bg-secondary">{{ incident.priority }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <strong>Status</strong>
+                    <div class="mt-1">
+                        <span class="badge bg-secondary">
+                            {{ incident.status|replace('_', ' ') }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <strong>Reported By</strong>
+                    <div class="mt-1">{{ incident.reporter.name }}</div>
+                </div>
+
+                <div class="col-md-6">
+                    <strong>Created At</strong>
+                    <div class="mt-1">{{ incident.created_at|ist }}</div>
+                </div>
+
+                <div class="col-12">
+                    <strong>Description</strong>
+                    <div class="border rounded p-3 mt-2 bg-light">
+                        {{ incident.description }}
+                    </div>
+                </div>
+
+                {% if incident.resolution %}
+                    <div class="col-12">
+                        <strong>Latest Resolution</strong>
+                        <div class="border rounded p-3 mt-2 bg-light">
+                            {{ incident.resolution }}
+                        </div>
+                    </div>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ADDITIONAL TECHNICIAN ASSISTANCE -->
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-header">
+            <h5 class="mb-0">Additional Technician Assistance</h5>
+        </div>
+
+        <div class="card-body">
+
+            {% if latest_assistance_request %}
+
+                <div class="mb-3">
+                    <strong>Request Status:</strong>
+
+                    {% if latest_assistance_request.status == "PENDING" %}
+                        <span class="badge bg-warning text-dark">
+                            Pending Admin Assignment
+                        </span>
+
+                    {% elif latest_assistance_request.status == "ASSIGNED" %}
+                        <span class="badge bg-primary">
+                            Technician Assigned
+                        </span>
+
+                    {% elif latest_assistance_request.status == "COMPLETED" %}
+                        <span class="badge bg-success">
+                            Assistance Completed
+                        </span>
+
+                    {% else %}
+                        <span class="badge bg-secondary">
+                            {{ latest_assistance_request.status }}
+                        </span>
+                    {% endif %}
+                </div>
+
+                <p>
+                    <strong>Requested By:</strong>
+                    {{ latest_assistance_request.requested_by.name }}
+                </p>
+
+                <p>
+                    <strong>Reason:</strong>
+                    {{ latest_assistance_request.reason }}
+                </p>
+
+                {% if latest_assistance_request.supporting_technician %}
+                    <p>
+                        <strong>Supporting Technician:</strong>
+                        {{ latest_assistance_request.supporting_technician.name }}
+                    </p>
+                {% endif %}
+
+                {% if latest_assistance_request.admin_note %}
+                    <p>
+                        <strong>Admin Note:</strong>
+                        {{ latest_assistance_request.admin_note }}
+                    </p>
+                {% endif %}
+
+                {% if latest_assistance_request.completed_at %}
+                    <p class="text-muted mb-0">
+                        <strong>Assistance Completed At:</strong>
+                        {{ latest_assistance_request.completed_at|ist }}
+                    </p>
+                {% endif %}
+
+            {% else %}
+
+                <p class="text-muted">
+                    No additional technician has been requested for this incident.
+                </p>
+
+            {% endif %}
+
+
+            <!-- PRIMARY TECHNICIAN REQUESTS ASSISTANCE -->
+            {% if is_primary_technician
+                  and incident.status == "IN_PROGRESS"
+                  and (
+                      not latest_assistance_request
+                      or latest_assistance_request.status == "COMPLETED"
+                  ) %}
+
+                <hr>
+
+                <form method="POST"
+                      action="{{ url_for(
+                          'main.request_incident_assistance',
+                          incident_id=incident.id
+                      ) }}">
+
+                    <div class="mb-3">
+                        <label for="reason" class="form-label fw-semibold">
+                            Why do you need another technician?
+                        </label>
+
+                        <textarea
+                            id="reason"
+                            name="reason"
+                            class="form-control"
+                            rows="3"
+                            required
+                            maxlength="2000"
+                            placeholder="Explain what additional help is needed..."
+                        ></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-outline-primary">
+                        Request Additional Technician
+                    </button>
+
+                </form>
+
+            {% elif is_primary_technician
+                  and latest_assistance_request
+                  and latest_assistance_request.status in ["PENDING", "ASSIGNED"] %}
+
+                <div class="alert alert-info mb-0">
+                    An assistance request is already active.
+                    You can request another technician after the current
+                    assistance is completed.
+                </div>
+
+            {% endif %}
+
+
+            <!-- SUPPORTING TECHNICIAN ACTION -->
+            {% if is_supporting_technician and support_request %}
+
+                <hr>
+
+                {% if support_request.status == "ASSIGNED" %}
+
+                    <div class="alert alert-info">
+                        You are helping with this incident.
+                        Complete your supporting work when finished.
+                        The primary technician remains responsible for
+                        resolving the incident.
+                    </div>
+
+                    <form method="POST"
+                          action="{{ url_for(
+                              'main.complete_technician_assistance',
+                              assistance_id=support_request.id
+                          ) }}">
+
+                        <button type="submit"
+                                class="btn btn-success"
+                                onclick="return confirm('Confirm that your supporting work is completed?');">
+
+                            Work Completed From My Side
+
+                        </button>
+
+                    </form>
+
+                {% elif support_request.status == "COMPLETED" %}
+
+                    <div class="alert alert-success mb-0">
+                        <strong>Your supporting work is completed!</strong>
+                        <p class="mb-0">
+                            You have informed the primary technician.
+                            The primary technician is responsible for
+                            updating and resolving this incident.
+                        </p>
+                    </div>
+
+                {% endif %}
+
+            {% endif %}
+
+        </div>
+    </div>
+
+
+    <!-- PRIMARY TECHNICIAN INCIDENT CONTROLS -->
+    {% if is_primary_technician %}
+
+        <div class="card shadow-sm mb-4">
+
+            <div class="card-header">
+                <h5 class="mb-0">Update Incident</h5>
+            </div>
+
+            <div class="card-body">
+
+                {% if incident.status in ["ASSIGNED", "REOPENED"] %}
+
+                    {% if incident.status == "REOPENED" %}
+                        <div class="alert alert-warning">
+                            <strong>Incident Reopened!</strong>
+                            The employee reported that the issue was not
+                            fully resolved. Review it and restart work.
+                        </div>
+                    {% else %}
+                        <p class="text-muted">
+                            This incident has been assigned to you.
+                            Start working to move it to IN PROGRESS.
+                        </p>
+                    {% endif %}
+
+                    <form method="POST"
+                          action="{{ url_for(
+                              'main.update_incident_status',
+                              incident_id=incident.id
+                          ) }}">
+
+                        <input type="hidden"
+                               name="status"
+                               value="IN_PROGRESS">
+
+                        <button type="submit" class="btn btn-primary">
+                            {% if incident.status == "REOPENED" %}
+                                Restart Work
+                            {% else %}
+                                Start Work
+                            {% endif %}
+                        </button>
+
+                    </form>
+
+                {% elif incident.status == "IN_PROGRESS" %}
+
+                    <p class="text-muted">
+                        You are responsible for this incident.
+                        Enter the resolution details when the issue has been fixed.
+                    </p>
+
+                    <form method="POST"
+                          action="{{ url_for(
+                              'main.update_incident_status',
+                              incident_id=incident.id
+                          ) }}">
+
+                        <input type="hidden"
+                               name="status"
+                               value="RESOLVED">
+
+                        <div class="mb-3">
+                            <label for="resolution" class="form-label">
+                                Resolution
+                            </label>
+
+                            <textarea
+                                id="resolution"
+                                name="resolution"
+                                class="form-control"
+                                rows="5"
+                                required
+                                placeholder="Describe how the issue was resolved..."
+                            ></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-success">
+                            Mark Incident as Resolved
+                        </button>
+
+                    </form>
+
+                {% elif incident.status == "RESOLVED" %}
+
+                    <div class="alert alert-success mb-0">
+                        <h6 class="fw-bold">Incident Resolved</h6>
+
+                        <p class="mb-2">
+                            It is now awaiting employee feedback and confirmation.
+                        </p>
+
+                        <strong>Resolution:</strong>
+                        <div class="mt-2">{{ incident.resolution }}</div>
+
+                        {% if incident.resolved_at %}
+                            <hr>
+                            <strong>Resolved At:</strong>
+                            <div class="mt-1">{{ incident.resolved_at|ist }}</div>
+                        {% endif %}
+                    </div>
+
+                {% elif incident.status == "CLOSED" %}
+
+                    <div class="alert alert-dark mb-0">
+                        This incident is closed after employee confirmation.
+                    </div>
+
+                {% else %}
+
+                    <div class="alert alert-secondary mb-0">
+                        No status update action is currently available.
+                    </div>
+
+                {% endif %}
+
+            </div>
+        </div>
+
+    {% elif is_supporting_technician %}
+
+        <div class="alert alert-secondary">
+            You are a supporting technician. You can add comments
+            and complete your assistance, but only the primary
+            technician can update or resolve the incident.
+        </div>
+
+    {% endif %}
+
+
+    <!-- ADD COMMENT -->
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-header">
+            <h5 class="mb-0">Add Comment</h5>
+        </div>
+
+        <div class="card-body">
+
+            <form method="POST"
+                  action="{{ url_for(
+                      'main.add_incident_comment',
+                      incident_id=incident.id
+                  ) }}">
+
+                <div class="mb-3">
+                    <label for="comment" class="form-label">
+                        Comment
+                    </label>
+
+                    <textarea
+                        id="comment"
+                        name="comment"
+                        class="form-control"
+                        rows="3"
+                        required
+                        placeholder="Enter your comment..."
+                    ></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Add Comment
+                </button>
+
+            </form>
+
+        </div>
+    </div>
+
+
+    <!-- COMMENTS -->
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-header">
+            <h5 class="mb-0">Comments</h5>
+        </div>
+
+        <div class="card-body">
+
+            {% for comment in incident.comments %}
+
+                <div class="border rounded p-3 mb-3">
+
+                    <div class="d-flex justify-content-between flex-wrap gap-2">
+                        <strong>{{ comment.user.name }}</strong>
+                        <small class="text-muted">
+                            {{ comment.created_at|ist }}
+                        </small>
+                    </div>
+
+                    <div class="mt-2">
+                        {{ comment.comment }}
+                    </div>
+
+                </div>
+
+            {% else %}
+
+                <p class="text-muted mb-0">No comments yet.</p>
+
+            {% endfor %}
+
+        </div>
+    </div>
+
+
+    <!-- INCIDENT HISTORY -->
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-header">
+            <h5 class="mb-0">Incident History</h5>
+        </div>
+
+        <div class="card-body">
+
+            {% if incident.history %}
+
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover align-middle">
+
+                        <thead class="table-light">
+                            <tr>
+                                <th>Date</th>
+                                <th>Changed By (User ID)</th>
+                                <th>Old Status</th>
+                                <th>New Status</th>
+                                <th>Comment</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            {% for history in incident.history %}
+
+                                <tr>
+                                    <td>{{ history.created_at|ist }}</td>
+                                    <td>{{ history.changed_by }}</td>
+                                    <td>{{ history.old_status or "-" }}</td>
+                                    <td>{{ history.new_status or "-" }}</td>
+                                    <td>{{ history.comment or "-" }}</td>
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            {% else %}
+
+                <p class="text-muted mb-0">No history available.</p>
+
+            {% endif %}
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
