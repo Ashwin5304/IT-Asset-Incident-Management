@@ -61,7 +61,10 @@ def generate_incident_number():
 
 @main.route("/")
 def index():
-    return render_template("index.html")
+    if current_user.is_authenticated:
+        return redirect(url_for("main.dashboard"))
+
+    return redirect(url_for("main.login"))
 
 
 @main.route("/db-test")
@@ -1296,4 +1299,3 @@ def complete_technician_assistance(assistance_id):
             incident_id=incident.id
         )
     )
-
